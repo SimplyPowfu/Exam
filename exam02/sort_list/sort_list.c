@@ -15,21 +15,21 @@ int ascending(int a, int b)
 t_list  *sort_list(t_list* lst, int (*cmp)(int, int))
 {
 	int swapped = 1;
-	t_list *cur = lst;
+	t_list *tmp = lst;
 
 	while (swapped == 1)
 	{
 		swapped = 0;
-		while (cur != 0 && cur->next != 0)
+		while (tmp != 0 && tmp->next != 0)
 		{
-			if (cmp(cur->data, cur->next->data) == 0)
+			if (cmp(tmp->data, tmp->next->data) == 0)
 			{
-				swap_values(cur, cur->next);
+				swap_values(tmp, tmp->next);
 				swapped = 1;
 			}
-			cur = cur->next;
+			tmp = tmp->next;
 		}
-		cur = lst;
+		tmp = lst;
 	}
 	return (lst);
 }
