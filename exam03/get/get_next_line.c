@@ -143,4 +143,3 @@ char	*get_next_line(int fd)
 	del_string(&string);
 	return (result);
 }
-
