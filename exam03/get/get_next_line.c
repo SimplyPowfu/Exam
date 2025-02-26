@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#define BUFFER_SIZE 4 //commentare quando pushi
+
 void	ft_bzero(char *s, int n)
 {
 	int	i = -1;
