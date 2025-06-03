@@ -3,21 +3,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 4 //al push
+#define BUFFER_SIZE 4 //commentare quando pushi
 
-void	ft_bzero(void *s, size_t n)
+void	ft_bzero(char *s, int n)
 {
-	size_t	i;
+	int	i = -1;
 
-	i = 0;
-	while (i < n)
-	{
-		*((unsigned char *)s + i) = '\0';
-		i++;
-	}
+	while (++i < n)
+		*(s + i) = '\0';
 }
 
-size_t	ft_strlen(const char *s)
+int	ft_strlen(const char *s)
 {
 	int	i;
 
@@ -29,18 +25,18 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*ft_strchr(char *s, int c)
 {
 	if (s == NULL)
 		return (NULL);
-	while (*s != '\0')
+	while (*s)
 	{
 		if (*s == c)
-			return ((char *)s);
+			return (s);
 		s++;
 	}
 	if (*s == '\0' && c == '\0')
-		return ((char *)s);
+		return (s);
 	return (NULL);
 }
 
@@ -53,13 +49,13 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (!str)
 		return (NULL);
 	r = str;
-	while (s1 && *s1 != '\0')
+	while (s1 && *s1)
 	{
 		*str = *s1;
 		s1++;
 		str++;
 	}
-	while (s2 && *s2 != '\0')
+	while (s2 && *s2)
 	{
 		*str = *s2;
 		str++;
@@ -83,7 +79,7 @@ static int	ft_read(int fd, char **str, char *buffer)
 		return (-1);
 	}
 	if (bytes_read == 0)
-		return (bytes_read);
+		return (0);
 	tmp = ft_strjoin(*str, buffer);
 	free (*str);
 	*str = tmp;
@@ -92,29 +88,23 @@ static int	ft_read(int fd, char **str, char *buffer)
 
 static void	get_result(char **str, char **result)
 {
-	size_t	i;
-	size_t	len;
+	int		i = -1;
+	int		len;
 	char	*diff;
 
 	diff = ft_strchr(*str, '\n');
 	len = ft_strlen(*str) - ft_strlen(diff) + 2;
 	*result = malloc(len);
-	if (!result)
-		return ;
-	i = 0;
-	while (i < len - 1)
-	{
+	while (++i < len - 1)
 		(*result)[i] = (*str)[i];
-		i++;
-	}
 	(*result)[i] = '\0';
 }
 
 static void	del_string(char **str)
 {
 	char	*tmp;
-	size_t	i;
-	size_t	j;
+	int	i;
+	int	j;
 
 	if (!ft_strchr(*str, '\n'))
 	{
@@ -123,8 +113,6 @@ static void	del_string(char **str)
 		return ;
 	}
 	tmp = malloc((ft_strlen(ft_strchr(*str, '\n'))) * sizeof(char));
-	if (!tmp)
-		return ;
 	i = 0;
 	j = ft_strlen(*str) - ft_strlen(ft_strchr(*str, '\n')) + 1;
 	while (j < ft_strlen(*str))
@@ -132,7 +120,7 @@ static void	del_string(char **str)
 	tmp[i] = '\0';
 	free(*str);
 	*str = tmp;
-	if (**str == 0)
+	if (!str)
 	{
 		free(*str);
 		*str = NULL;
@@ -153,22 +141,9 @@ char	*get_next_line(int fd)
 	while (ft_strchr(string, '\n') == NULL && bytes_read > 0)
 		bytes_read = ft_read(fd, &string, buffer);
 	free(buffer);
-	if (bytes_read == -1)
-		return (NULL);
-	if (ft_strlen(string) == 0)
+	if (bytes_read == -1 || ft_strlen(string) == 0)
 		return (NULL);
 	get_result(&string, &result);
 	del_string(&string);
 	return (result);
 }
-
-// int main()
-// {
-// 	int	fd = open("filefd.txt", O_RDONLY);
-// 	char *line;
-// 	line = get_next_line(fd);
-// 	printf("%s", line);
-// 	free (line);
-// 	close (fd);
-// 	return (0);
-// }
