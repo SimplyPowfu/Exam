@@ -48,10 +48,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char		*str;
 	char		*r;
-	size_t		len;
 
-	len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	str = (char *)malloc(len * sizeof(char));
+	str = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!str)
 		return (NULL);
 	r = str;

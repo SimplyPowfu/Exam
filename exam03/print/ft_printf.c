@@ -122,4 +122,3 @@ int	ft_printf(const char *input, ...)
 	va_end(arg);
 	return (len);
 }
-
