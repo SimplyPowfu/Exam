@@ -16,7 +16,7 @@ void	ft_putstr_fd2(char *str, char *arg)
 void ft_execute(char **argv, int i, int tmp_fd, char **env)
 {
 	argv[i] = NULL;
-	dup2(tmp_fd, STDIN_FILENO);
+	dup2(tmp_fd, 0);
 	close(tmp_fd);
 	execve(argv[0], argv, env);
 	ft_putstr_fd2("error: cannot execute ", argv[0]);
@@ -25,44 +25,42 @@ void ft_execute(char **argv, int i, int tmp_fd, char **env)
 
 int	main(int argc, char **argv, char **env)
 {
-	int	i;
+	int	i = 0;
 	int fd[2];
-	int tmp_fd;
+	int tmp_fd = dup(0);
 	(void)argc;
 
-	i = 0;
-	tmp_fd = dup(STDIN_FILENO);
-	while (argv[i] && argv[i + 1]) //check if the end is reached
+	while (argv[i] && argv[i + 1])
 	{
-		argv = &argv[i + 1];	//the new argv start after the ; or |
+		argv = &argv[i + 1];
 		i = 0;
-		while (argv[i] && strcmp(argv[i], ";") && strcmp(argv[i], "|"))	//count until we have all informations to execute the next child;
+		while (argv[i] && strcmp(argv[i], ";") && strcmp(argv[i], "|"))
 			i++;
-		if (strcmp(argv[0], "cd") == 0) //cd
+		if (strcmp(argv[0], "cd") == 0)
 		{
 			if (i != 2)
 				ft_putstr_fd2("error: cd: bad arguments", NULL);
 			else if (chdir(argv[1]) != 0)
 				ft_putstr_fd2("error: cd: cannot change directory to ", argv[1]	);
 		}
-		else if (i != 0 && (argv[i] == NULL || strcmp(argv[i], ";") == 0)) //exec in stdout
+		else if (i != 0 && (argv[i] == NULL || strcmp(argv[i], ";") == 0))
 		{
-			if ( fork() == 0)
+			if (fork() == 0)
 				ft_execute(argv, i, tmp_fd, env);
 			else
 			{
 				close(tmp_fd);
-				while(waitpid(-1, NULL, WUNTRACED) != -1)
+				while(waitpid(-1, NULL, 2) != -1)
 					;
-				tmp_fd = dup(STDIN_FILENO);
+				tmp_fd = dup(0);
 			}
 		}
-		else if(i != 0 && strcmp(argv[i], "|") == 0) //pipe
+		else if(i != 0 && strcmp(argv[i], "|") == 0)
 		{
 			pipe(fd);
-			if ( fork() == 0)
+			if (fork() == 0)
 			{
-				dup2(fd[1], STDOUT_FILENO);
+				dup2(fd[1], 1);
 				close(fd[0]);
 				close(fd[1]);
 				ft_execute(argv, i, tmp_fd, env);
